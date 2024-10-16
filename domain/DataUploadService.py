@@ -5,8 +5,6 @@ from infrastructure.DataUploadRepository import DataUploadRepository
 from core import domain_constants as constants
 from cie.cie10 import CIECodes
 
-import os 
-url = os.environ.get("LOCAL_URL_TO_EXCEL")
 
 class DataUploadService:
     @staticmethod
@@ -140,9 +138,6 @@ class DataUploadService:
             data['fecha de consulta'] = pd.to_datetime(data['fecha de consulta'], format='%d/%m/%Y', errors='coerce')
             data['Fecha Nacimiento'] = pd.to_datetime(data['Fecha Nacimiento'], format='%d/%m/%Y', errors='coerce')
 
-
-            # Archivo opcional, para ver como queda el dataframe limpio
-            data.to_excel(url, index=False)
 
             return DataUploadRepository.insert(data)
         

@@ -19,9 +19,6 @@ Tanto la URL como la KEY del API, son proveidas por Supabase:
 export SUPABASE_URL="my-url-to-my-awesome-supabase-instance"
 export SUPABASE_KEY="my-supa-dupa-secret-supabase-api-key"
 
-Ruta para guardar una muestra en excel de los datos que se subirán a Supabase:
-export LOCAL_URL_TO_EXCEL="C:/Users/usuario/Desktop/Folder/archivo.xlsx"
-
 
 ## Pasos para probar la aplicación desde local
 
