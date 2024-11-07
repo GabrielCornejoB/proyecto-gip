@@ -13,7 +13,7 @@ class ModelPredictionService:
 
     # Método para transformar los valores de persona
     @staticmethod
-    def transformate_dataframe(person: dict):
+    def transform_dataframe(person: dict):
         # Se deben todas las validaciones correspondientes
         # Construir la ruta basada en la ubicación del archivo actual
         base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -82,11 +82,11 @@ class ModelPredictionService:
             'consultation_code': 'codigo de la consulta',
             'user_type': 'Tipo de Usuario',
             'commitment_type': 'Tipo de Compromiso',
-            'identification_type': 'tipo de identificacion',  # Aquí puedes ajustar según el valor específico de cada tipo
-            'city': 'Ciudad',                            # Ajusta según la ciudad específica
-            'appointment_status': 'Estado de la Cita',   # Ajusta según el estado específico
-            'gender': 'Género',                         # Ajusta según el género específico
-            'subject': 'Asunto',                       # Ajusta según el asunto específico
+            'identification_type': 'tipo de identificacion', 
+            'city': 'Ciudad',                            
+            'appointment_status': 'Estado de la Cita',   
+            'gender': 'Género',                        
+            'subject': 'Asunto',                      
             'procedure_type': 'Tipo de Procedimiento',
             'consultation_date': 'fecha de consulta',
             'birth_date': 'Fecha Nacimiento'
