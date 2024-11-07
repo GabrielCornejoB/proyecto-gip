@@ -9,3 +9,4 @@ supabase==2.7.4
 pandas==2.2.3
 openpyxl==3.1.5
 cie==0.208
+sklearn==1.0.2
