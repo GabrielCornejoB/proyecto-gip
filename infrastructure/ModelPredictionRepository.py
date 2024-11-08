@@ -15,6 +15,12 @@ class ModelPredictionRepository:
     @staticmethod
     def prediction(user_df: DataFrame):
 
+        desc_code = { 
+            'R': 'Síntomas inespecíficos', 
+            'Z': 'Factores preventivos', 
+            'F': 'Trastornos mentales/comportamiento',
+        }
+
         base_dir = os.path.dirname(os.path.abspath(__file__))
         filename = os.path.join(base_dir, '..', 'core', 'models', 'modelo.pkl')
         model_boos,variables, labelencoder, min_max_scaler = pickle.load(open(filename, 'rb'))
@@ -24,9 +30,10 @@ class ModelPredictionRepository:
 
 
         response = user_df['pred'][0]
+        desc = desc_code.get(response, 'Código no válido')
 
         return {
             "status": 200,
-            "message": response
+            "message": f"{response} - {desc}"
         }
     
