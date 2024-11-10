@@ -96,7 +96,7 @@ class DataUploadService:
             monthly_df.replace({'Ciudad': constants.VALORES_CORRECTOS}, inplace=True)
 
             #Join
-            data = pd.merge(rips_df, monthly_df, on=['identificacion encriptada','fecha de consulta'],how='right')
+            data = pd.merge(rips_df, monthly_df, on=['identificacion encriptada','fecha de consulta'],how='inner')
 
             #Corrección del tipo de datos object a categorías
             data['tipo de identificacion']=data['tipo de identificacion'].astype('category')
