@@ -3,6 +3,7 @@ from fastapi import HTTPException
 import pandas as pd
 from infrastructure.DataUploadRepository import DataUploadRepository
 from core import domain_constants as constants
+from datetime import datetime
 from cie.cie10 import CIECodes
 
 
@@ -34,7 +35,8 @@ class DataUploadService:
         constants.TIPO_DIAGNOSTICO,
         constants.VALOR_CONSULTA,
         constants.VALOR_CUOTA_MODERADORA,
-        constants.VALOR_NETO_PAGAR
+        constants.VALOR_NETO_PAGAR,
+        constants.ARCHIVOS_ORIGEN
         ]
         
         # Verificación de que todas las columnas existen en el DataFrame de RIPS
@@ -58,7 +60,8 @@ class DataUploadService:
         constants.ESTADO_CITA,
         constants.TIPO_PROCEDIMIENTO,
         constants.TIPO_USUARIO,
-        constants.IDENTIFICACION_ENCRIPTADA  # Esta ya estaba definida, puedes reutilizarla
+        constants.IDENTIFICACION_ENCRIPTADA,  # Esta ya estaba definida, puedes reutilizarla
+        constants.ARCHIVOS_ORIGEN
         ]
 
         # Verificación de que todas las columnas existen en el DataFrame mensual
@@ -97,6 +100,14 @@ class DataUploadService:
 
             #Join
             data = pd.merge(rips_df, monthly_df, on=['identificacion encriptada','fecha de consulta'],how='inner')
+
+            #Creación de la columna batch_id
+            data['batch_id'] = datetime.now().isoformat()
+
+            #Creación de la columna origen_datos
+            data['archivos_origen'] = data['archivos_origen_x'].astype(str) + ' ' + data['archivos_origen_y'].astype(str)
+            # Eliminar las columnas originales si ya no las necesitas
+            data.drop(['archivos_origen_x', 'archivos_origen_y'], axis=1, inplace=True)
 
             #Corrección del tipo de datos object a categorías
             data['tipo de identificacion']=data['tipo de identificacion'].astype('category')

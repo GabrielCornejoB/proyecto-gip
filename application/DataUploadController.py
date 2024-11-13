@@ -3,6 +3,8 @@ from io import BytesIO
 from fastapi import UploadFile, APIRouter, HTTPException
 from pandas import read_excel
 
+import os
+
 from domain.DataUploadService import DataUploadService
 from infrastructure.models.UserModel import User
 
@@ -14,8 +16,14 @@ async def data_upload(rips: UploadFile, monthly: UploadFile):
     try:
         rips_file = await rips.read()
         rips_df = read_excel(BytesIO(rips_file))
+        rips_filename = os.path.splitext(rips.filename)[0]
+        rips_df['archivos_origen'] = rips_filename
+        #rips_df['batch_id'] = datetime.now().isoformat()
         monthly_file = await monthly.read()
         monthly_df = read_excel(BytesIO(monthly_file))
+        monthly_filename = os.path.splitext(monthly.filename)[0]
+        monthly_df['archivos_origen'] = monthly_filename
+        #monthly_df['batch_id'] = datetime.now().isoformat()
     except HTTPException as e:
         # Captura las excepciones HTTP lanzadas desde el servicio
         raise e

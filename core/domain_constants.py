@@ -104,7 +104,7 @@ VALORES_CORRECTOS = {
 
 
 #Num columnas RIPS
-COLUMNAS_RIPS = 15
+COLUMNAS_RIPS = 16
 
 #Columnas RIPS
 TIPO_IDENTIFICACION = "tipo de identificacion"
@@ -122,10 +122,11 @@ VALOR_CONSULTA = "valor de la consulta"
 VALOR_CUOTA_MODERADORA = "valor cuota moderadora"
 VALOR_NETO_PAGAR = "valor neto a pagar"
 IDENTIFICACION_ENCRIPTADA = "identificacion encriptada"
+ARCHIVOS_ORIGEN = "archivos_origen"
 
 
 #Num columnas Mensual
-COLUMNAS_MENSUAL = 16
+COLUMNAS_MENSUAL = 17
 #Columnas Mensual
 TIPO_IDENTIFICACION_PACIENTE = "Tipo de Identificación del Paciente"
 CIUDAD = "Ciudad"
@@ -142,4 +143,4 @@ FECHA_CITA = "Fecha de la Cita"
 ESTADO_CITA = "Estado de la Cita"
 TIPO_PROCEDIMIENTO = "Tipo de Procedimiento"
 TIPO_USUARIO = "Tipo de Usuario"
-
+ARCHIVOS_ORIGEN = "archivos_origen"
