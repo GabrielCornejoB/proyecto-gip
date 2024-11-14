@@ -1,8 +1,9 @@
-from pandas import DataFrame 
+from pandas import DataFrame
 from fastapi import HTTPException
 import pandas as pd
 from infrastructure.DataUploadRepository import DataUploadRepository
 from core import domain_constants as constants
+from datetime import datetime
 from cie.cie10 import CIECodes
 
 
@@ -13,10 +14,10 @@ class DataUploadService:
         # Verificación de que las columnas necesarias existen
         if len(rips_df.columns) != constants.COLUMNAS_RIPS:
             raise HTTPException(status_code=400, detail="Columnas faltantes en el archivo RIPS")
-        
+
         if len(monthly_df.columns) != constants.COLUMNAS_MENSUAL:
             raise HTTPException(status_code=400, detail="Columnas faltantes en el archivo mensual")
-        
+
         # Verificación de que las columnas necesarias existen
 
         required_columns_rips = [
@@ -34,14 +35,15 @@ class DataUploadService:
         constants.TIPO_DIAGNOSTICO,
         constants.VALOR_CONSULTA,
         constants.VALOR_CUOTA_MODERADORA,
-        constants.VALOR_NETO_PAGAR
+        constants.VALOR_NETO_PAGAR,
+        constants.ARCHIVOS_ORIGEN
         ]
-        
+
         # Verificación de que todas las columnas existen en el DataFrame de RIPS
         for col in required_columns_rips:
             if col not in rips_df.columns:
                 raise HTTPException(status_code=400, detail=f"Columna '{col}' no encontrada en el archivo RIPS")
-        
+
         required_columns_mensual = [
         constants.TIPO_IDENTIFICACION_PACIENTE,
         constants.CIUDAD,
@@ -58,16 +60,17 @@ class DataUploadService:
         constants.ESTADO_CITA,
         constants.TIPO_PROCEDIMIENTO,
         constants.TIPO_USUARIO,
-        constants.IDENTIFICACION_ENCRIPTADA  # Esta ya estaba definida, puedes reutilizarla
+        constants.IDENTIFICACION_ENCRIPTADA,  # Esta ya estaba definida, puedes reutilizarla
+        constants.ARCHIVOS_ORIGEN
         ]
 
         # Verificación de que todas las columnas existen en el DataFrame mensual
         for col in required_columns_mensual:
             if col not in monthly_df.columns:
                 raise HTTPException(status_code=400, detail=f"Columna '{col}' no encontrada en el archivo Mensual")
-        
-        
-        
+
+
+
         #Limpieza y transformación de datos
 
         try:
@@ -83,7 +86,7 @@ class DataUploadService:
             rips_df = rips_df.drop('tipo de diagnostico', axis=1)
 
 
-            monthly_df = monthly_df.drop('Tipo de Identificación del Paciente', axis=1)
+            #monthly_df = monthly_df.drop('Tipo de Identificación del Paciente', axis=1)
             monthly_df = monthly_df.drop('Correo Electrónico', axis=1)
             monthly_df = monthly_df.drop('Dirección', axis=1)
             monthly_df = monthly_df.drop('Ciudad', axis=1)
@@ -96,7 +99,21 @@ class DataUploadService:
             monthly_df.replace({'Ciudad': constants.VALORES_CORRECTOS}, inplace=True)
 
             #Join
-            data = pd.merge(rips_df, monthly_df, on=['identificacion encriptada','fecha de consulta'],how='inner')
+            #data = pd.merge(rips_df, monthly_df, on=['identificacion encriptada','fecha de consulta'],how='inner')
+            data = rips_df.merge(monthly_df, how='right', on=['identificacion encriptada','fecha de consulta'])
+
+            #Creación de la columna batch_id
+            data['batch_id'] = datetime.now().isoformat()
+
+            #Creación de la columna origen_datos
+            valor_comun = data['archivos_origen_x'].dropna().iloc[0]
+            data['archivos_origen'] = data['archivos_origen_x'].fillna(valor_comun).astype(str) + ';' + data['archivos_origen_y'].astype(str)
+
+            # Eliminar las columnas originales si ya no las necesitas
+            data.drop(['archivos_origen_x', 'archivos_origen_y'], axis=1, inplace=True)
+            data = data.drop('tipo de identificacion',axis=1)
+            data['tipo de identificacion'] = data['Tipo de Identificación del Paciente']
+            data = data.drop('Tipo de Identificación del Paciente',axis=1)
 
             #Corrección del tipo de datos object a categorías
             data['tipo de identificacion']=data['tipo de identificacion'].astype('category')
@@ -123,32 +140,42 @@ class DataUploadService:
             #Descripción de códigos CIE
             cie = CIECodes()
 
-            cie_dict = {} 
+            cie_dict = {}
 
             for code, content in cie.tree.items():
                 full_info = cie.info(code=code)  # Cargar la propiedad 'multiple_descriptions'
-                
+
                 # Verificar que 'full_info' y 'description' existan antes de asignar
                 if full_info and 'description' in full_info:
                     cie_dict[code] = full_info['description']  # Asignar directamente la descripción
 
             data['Descripcion dx principal'] = data['cod dx principal'].map(cie_dict)
             #Convertimos el tipo de fecha
-            
+
             # Convertir las fechas en el DataFrame 'data' a formato YYYY-MM-DD
             data['fecha de consulta'] = pd.to_datetime(data['fecha de consulta'], format='%d/%m/%Y', errors='coerce')
             data['Fecha Nacimiento'] = pd.to_datetime(data['Fecha Nacimiento'], format='%d/%m/%Y', errors='coerce')
 
+            # Se convierten campos a tipo objeto
+            data['codigo de la consulta']=data['codigo de la consulta'].astype('object')
+            data['cod dx principal']=data['cod dx principal'].astype('object')
+            data['Descripcion dx principal']=data['Descripcion dx principal'].astype('object')
+
+            #Imputación de nulos por un cáracter vacío
+            data['codigo de la consulta'] = data['codigo de la consulta'].fillna('')
+            data['cod dx principal'] = data['cod dx principal'].fillna('')
+            data['Descripcion dx principal'] = data['Descripcion dx principal'].fillna('')
+
 
             return DataUploadRepository.insert(data)
-        
+
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Error interno durante la limpieza de datos: {str(e)}")
-        
 
 
 
-        
+
+
 
     # Método de e.g. insertar usuario
     @staticmethod
