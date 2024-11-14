@@ -102,6 +102,12 @@ VALORES_CORRECTOS = {
     '43': 'Almeida'
 }
 
+VALORES_VALIDOS_PROCEDIMIENTO = [
+    "Consulta psicológica",
+    "Consulta de pareja",
+    "Evaluación neuropsicológica",
+    "Docencia asistencial"
+]
 
 #Num columnas RIPS
 COLUMNAS_RIPS = 16

@@ -166,6 +166,8 @@ class DataUploadService:
             data['cod dx principal'] = data['cod dx principal'].fillna('')
             data['Descripcion dx principal'] = data['Descripcion dx principal'].fillna('')
 
+            #Se controlan los valores de la columna Tipo de procedimiento
+            data = data[data['Tipo de Procedimiento'].isin(constants.VALORES_VALIDOS_PROCEDIMIENTO)]
 
             return DataUploadRepository.insert(data)
 
