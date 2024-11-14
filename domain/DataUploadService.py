@@ -156,10 +156,12 @@ class DataUploadService:
             data['fecha de consulta'] = pd.to_datetime(data['fecha de consulta'], format='%d/%m/%Y', errors='coerce')
             data['Fecha Nacimiento'] = pd.to_datetime(data['Fecha Nacimiento'], format='%d/%m/%Y', errors='coerce')
 
-            #Imputación de nulos por un cáracter vacío
+            # Se convierten campos a tipo objeto
             data['codigo de la consulta']=data['codigo de la consulta'].astype('object')
             data['cod dx principal']=data['cod dx principal'].astype('object')
             data['Descripcion dx principal']=data['Descripcion dx principal'].astype('object')
+
+            #Imputación de nulos por un cáracter vacío
             data['codigo de la consulta'] = data['codigo de la consulta'].fillna('')
             data['cod dx principal'] = data['cod dx principal'].fillna('')
             data['Descripcion dx principal'] = data['Descripcion dx principal'].fillna('')
